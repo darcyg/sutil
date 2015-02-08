@@ -62,20 +62,27 @@ namespace detail
 {
 
 template <typename T, typename P>
-struct projected_point_return_result : public std::pair<T, P>{
+struct projected_point_return_result{
     typedef T value_type;
-    projected_point_return_result(T const& c = T(0)){
-        this->first = c;
+    T distance;
+    P point;
+    std::pair<T&, P&> to_pair(){
+        return { distance, point};
     }
+    std::pair<T const&, P const&> to_pair()const{
+        return {distance, point};
+    }
+    projected_point_return_result(T const& c = T(0)):distance(c){}
+
     friend inline bool operator<(projected_point_return_result const& left,
                                  projected_point_return_result const& right)
     {
-        return left.first < right.first;
+        return left.distance < right.distance;
     }
 
     friend inline bool operator==(projected_point_return_result const& left,
             projected_point_return_result const& right){
-        return left.first == right.first;
+        return left.distance == right.distance;
     }
 };
 
@@ -163,15 +170,15 @@ public :
         calculation_type const c1 = dot_product(w, v);
         if (c1 <= zero)
         {
-            result.first = strategy.apply(p, p1);
-            geometry::convert(p1, result.second);
+            result.distance = strategy.apply(p, p1);
+            geometry::convert(p1, result.point);
             return result;
         }
         calculation_type const c2 = dot_product(v, v);
         if (c2 <= c1)
         {
-            result.first = strategy.apply(p, p2);
-            geometry::convert(p2, result.second);
+            result.distance = strategy.apply(p, p2);
+            geometry::convert(p2, result.point);
             return result;
         }
 
@@ -181,8 +188,8 @@ public :
         multiply_value(v, b);
         add_point(projected, v);
 
-        result.first = strategy.apply(p, projected);
-        geometry::convert(projected, result.second );
+        result.distance = strategy.apply(p, projected);
+        geometry::convert(projected, result.point );
         return result;
     }
 };
@@ -248,8 +255,8 @@ public :
     {
         Strategy s;
         return_type ret;
-        ret.first = result_from_distance<Strategy, P, PS>::apply(s, value.first );
-        geometry::convert(result_from_distance<Strategy, P, PS>::apply(s, value.second ), ret.second );
+        ret.distance = result_from_distance<Strategy, P, PS>::apply(s, value.distance );
+        geometry::convert(result_from_distance<Strategy, P, PS>::apply(s, value.point ), ret.point );
         return ret;
     }
 };
