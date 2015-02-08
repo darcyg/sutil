@@ -216,7 +216,6 @@ namespace boost {
      const bgl_named_params<T, Tag, Base>&
      BOOST_GRAPH_ENABLE_IF_MODELS_PARM(VertexListGraph,vertex_list_graph_tag))
   {
-    std::cout << __LINE__ << std::endl;
     dijkstra_shortest_paths_to_dest(g, &s, &s + 1, d, predecessor, distance, weight,
                             index_map, compare, combine, inf, zero, vis);
   }
@@ -238,13 +237,13 @@ namespace boost {
   {
     typedef typename property_traits<ColorMap>::value_type ColorValue;
     typedef color_traits<ColorValue> Color;
-    typename graph_traits<VertexListGraph>::vertex_iterator ui, ui_end;
+    /*typename graph_traits<VertexListGraph>::vertex_iterator ui, ui_end;
     for (boost::tie(ui, ui_end) = vertices(g); ui != ui_end; ++ui) {
-      vis.initialize_vertex(*ui, g);
-      put(distance, *ui, inf);
-      put(predecessor, *ui, *ui);
-      put(color, *ui, Color::white());
-    }
+      //vis.initialize_vertex(*ui, g);
+      //put(distance, *ui, inf);
+      //put(predecessor, *ui, *ui);
+      //put(color, *ui, Color::white());
+    }*/
     for (SourceInputIter it = s_begin; it != s_end; ++it) {
       put(distance, *it, zero);
     }
@@ -372,8 +371,14 @@ namespace boost {
       typename std::vector<D>::size_type
         n = is_default_param(distance) ? num_vertices(g) : 1;
         std::unordered_map<typename graph_traits<VertexListGraph>::vertex_descriptor , D> distance_map;
+        distance_map.reserve(n);
+
+        //std::vector<D> distance_map(n);
       detail::dijkstra_to_dest_dispatch2
         (g, s, d, choose_param(distance, make_lazy_property_map(distance_map, inf)),
+       // (g, s, choose_param(distance, make_iterator_property_map
+        //                      (distance_map.begin(), index_map,
+         //                             distance_map[0])),
          weight, index_map, params);
     }
 
