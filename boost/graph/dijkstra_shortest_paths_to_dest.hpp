@@ -12,6 +12,15 @@
 //   04 April 2001: Added named parameter variant. (Jeremy Siek)
 //   01 April 2001: Modified to use new <boost/limits.hpp> header. (JMaddock)
 //
+
+
+/*
+   dijkstra_shortest_paths edit the the source to dest vertex
+   edit by syhkiller@163.com
+   all version will not initialize distance map and color map and precursor map
+   if user did not provide distance map, it will use lazy property by default
+   return inf
+ */
 #ifndef BOOST_GRAPH_DIJKSTRA_TO_DEST_HPP
 #define BOOST_GRAPH_DIJKSTRA_TO_DEST_HPP
 
@@ -36,7 +45,9 @@
 #  include <boost/pending/mutable_queue.hpp>
 #endif // BOOST_GRAPH_DIJKSTRA_TESTING
 #include  <boost/graph/dijkstra_shortest_paths.hpp>
+#include  <unordered_map>
 #include    "breadth_first_search_to_dest.hpp"
+#include    "lazy_associative_property_map.hpp"
 namespace boost {
 
   // Call breadth first search with default color map.
@@ -205,6 +216,7 @@ namespace boost {
      const bgl_named_params<T, Tag, Base>&
      BOOST_GRAPH_ENABLE_IF_MODELS_PARM(VertexListGraph,vertex_list_graph_tag))
   {
+    std::cout << __LINE__ << std::endl;
     dijkstra_shortest_paths_to_dest(g, &s, &s + 1, d, predecessor, distance, weight,
                             index_map, compare, combine, inf, zero, vis);
   }
@@ -293,12 +305,13 @@ namespace boost {
   dijkstra_shortest_paths_to_dest
     (const VertexListGraph& g,
      typename graph_traits<VertexListGraph>::vertex_descriptor s,
-     typename graph_traits<VertexListGraph>::vertex_descriptord,
+     typename graph_traits<VertexListGraph>::vertex_descriptor d,
      PredecessorMap predecessor, DistanceMap distance, WeightMap weight,
      IndexMap index_map,
      Compare compare, Combine combine, DistInf inf, DistZero zero,
      DijkstraVisitor vis)
   {
+    std::cout << __LINE__ << std::endl;
     dijkstra_shortest_paths_to_dest(g, &s, &s + 1, predecessor, distance,
                             weight, index_map,
                             compare, combine, inf, zero, vis);
@@ -353,14 +366,14 @@ namespace boost {
     {
       // Default for distance map
       typedef typename property_traits<WeightMap>::value_type D;
+      D inf = choose_param(get_param(params, distance_inf_t()),
+                           (std::numeric_limits<D>::max)());
+
       typename std::vector<D>::size_type
         n = is_default_param(distance) ? num_vertices(g) : 1;
-      std::vector<D> distance_map(n);
-
+        std::unordered_map<typename graph_traits<VertexListGraph>::vertex_descriptor , D> distance_map;
       detail::dijkstra_to_dest_dispatch2
-        (g, s, d, choose_param(distance, make_iterator_property_map
-                            (distance_map.begin(), index_map,
-                             distance_map[0])),
+        (g, s, d, choose_param(distance, make_lazy_property_map(distance_map, inf)),
          weight, index_map, params);
     }
 

@@ -13,8 +13,15 @@
 
 /*
   Breadth First Search Algorithm (Cormen, Leiserson, and Rivest p. 470)
+*/
+
+/*
+
   bfs when first meet destination vertex will stop,
   after examine vertex
+
+  [note] both breadth_first_visit_to_dest and breadth_first_search_to_dest
+  will not initialize the color map
   edit by syhkiller@163.com
 */
 #include <boost/config.hpp>
@@ -100,6 +107,7 @@ namespace boost {
      typename graph_traits<VertexListGraph>::vertex_descriptor d,
      Buffer& Q, BFSVisitor vis, ColorMap color)
   {
+      /*
     // Initialization
     typedef typename property_traits<ColorMap>::value_type ColorValue;
     typedef color_traits<ColorValue> Color;
@@ -107,7 +115,7 @@ namespace boost {
     for (boost::tie(i, i_end) = vertices(g); i != i_end; ++i) {
       vis.initialize_vertex(*i, g);
       put(color, *i, Color::white());
-    }
+    }*/
     breadth_first_visit_to_dest(g, sources_begin, sources_end, d, Q, vis, color);
   }
 
